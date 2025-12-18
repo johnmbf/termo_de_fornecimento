@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Itens</title>
+    <title>Solicitação de Materiais</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,7 +18,9 @@
     <div id="step1" class="step-content active">
         <div class="form-group search-wrapper">
             <label>Código do Projeto</label>
-            <input type="text" id="projectSearch" placeholder="Digite o código (ex: 798) ou nome..." autocomplete="off">
+            <!-- REMOVIDO TEXTO DO PLACEHOLDER -->
+            <input type="text" id="projectSearch" placeholder="" autocomplete="off">
+            
             <div id="projectList" class="project-list">
                 <div class="project-option" style="color: #999;">Carregando projetos...</div>
             </div>
@@ -38,7 +40,6 @@
         </div>
 
         <button class="btn" onclick="goToStep2()">Continuar</button>
-        <!-- Botão Voltar para o Menu -->
         <a href="index.html" class="btn btn-secondary" style="text-align:center; display:block; margin-top:10px;">Voltar ao Menu</a>
     </div>
 
@@ -50,10 +51,13 @@
         </div>
 
         <div class="form-group">
-            <label>Termo de Fornecimento</label>
-            <select id="termSelect">
-                <option value="" disabled selected>Carregando termos...</option>
-            </select>
+            <label>Selecione o Termo de Fornecimento:</label>
+            <!-- AQUI: Troca do Select pelo Grid de Blocos -->
+            <div id="termGrid" class="term-grid">
+                <div style="grid-column: 1/-1; text-align: center; color: #999;">Carregando termos...</div>
+            </div>
+            <!-- Input oculto para guardar qual termo foi clicado -->
+            <input type="hidden" id="selectedTermValue">
         </div>
 
         <div id="itemsContainer" style="display:none;">
@@ -85,7 +89,6 @@
     </div>
 </div>
 
-<!-- Link para o Javascript separado -->
 <script src="js/termo.js"></script>
 
 </body>
