@@ -3,41 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Solicitação de Itens</title>
+    <title>Portal de Fornecimento</title>
     <style>
-        /* (MANTIVE O MESMO CSS PARA NÃO QUEBRAR O LAYOUT) */
         :root { --primary: #2563eb; --success: #10b981; --bg: #f8fafc; --card: #ffffff; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 800px; background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: relative; min-height: 400px; }
+        
         .header { margin-bottom: 30px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; }
         h1 { margin: 0; color: #1e293b; font-size: 1.5rem; }
         p.subtitle { color: #64748b; margin: 5px 0 0 0; font-size: 0.9rem; }
+        
         .step-content { display: none; animation: fadeIn 0.4s ease; }
         .step-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         .form-group { margin-bottom: 20px; position: relative; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: #475569; }
         input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; transition: all 0.2s; }
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        input[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; }
+        
+        /* Removed input[readonly] style since user can edit now */
+        
         .project-feedback { margin-top: 8px; padding: 10px; background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 6px; font-size: 0.9rem; display: none; }
+
         .search-wrapper { position: relative; }
         .project-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; border-top: none; border-radius: 0 0 6px 6px; max-height: 200px; overflow-y: auto; z-index: 10; display: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .project-option { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
         .project-option:hover { background-color: #eff6ff; color: var(--primary); }
         .project-option strong { display: block; color: #1e293b; }
         .project-option small { color: #64748b; }
+
         .items-header { display: grid; grid-template-columns: 40px 2fr 1fr 1fr 1fr; gap: 10px; padding: 10px; background: #f1f5f9; font-weight: bold; font-size: 0.85rem; border-radius: 6px 6px 0 0; }
         .item-row { display: grid; grid-template-columns: 40px 2fr 1fr 1fr 1fr; gap: 10px; padding: 15px 10px; border-bottom: 1px solid #e2e8f0; align-items: center; }
+        
         .btn { background-color: var(--primary); color: white; border: none; padding: 14px 28px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; }
         .btn:hover { background-color: #1d4ed8; }
         .btn-secondary { background-color: #64748b; margin-top: 10px; }
+        
         .user-summary { background: #eff6ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bfdbfe; color: #1e40af; font-size: 0.9rem; }
         .loading { text-align: center; color: #64748b; padding: 20px; }
+
         .success-screen { text-align: center; padding: 40px 20px; }
         .success-icon { width: 80px; height: 80px; background: #d1fae5; color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 40px; }
         .success-screen h2 { color: #065f46; margin-bottom: 10px; }
         .success-screen p { color: #6b7280; margin-bottom: 30px; }
+
         @media (max-width: 600px) {
             .items-header { display: none; }
             .item-row { grid-template-columns: 30px 1fr; gap: 5px; }
@@ -58,7 +68,7 @@
     <div id="step1" class="step-content active">
         <div class="form-group search-wrapper">
             <label>Código do Projeto</label>
-            <input type="text" id="projectSearch" placeholder="Digite o código ou nome do projeto..." autocomplete="off">
+            <input type="text" id="projectSearch" placeholder="Digite o código (ex: 798) ou nome..." autocomplete="off">
             <div id="projectList" class="project-list">
                 <div class="project-option" style="color: #999;">Carregando projetos...</div>
             </div>
@@ -69,7 +79,8 @@
 
         <div class="form-group">
             <label>Coordenador / Solicitante</label>
-            <input type="text" id="userName" placeholder="Preenchimento automático..." readonly>
+            <!-- REMOVIDO READONLY: Agora o usuário pode editar -->
+            <input type="text" id="userName" placeholder="Será preenchido automaticamente, mas você pode alterar">
         </div>
 
         <div class="form-group">
@@ -111,7 +122,7 @@
         <button class="btn btn-secondary" onclick="backToStep1()">Voltar</button>
     </div>
 
-    <!-- PASSO 3 (Sucesso) -->
+    <!-- PASSO 3 -->
     <div id="step3" class="step-content">
         <div class="success-screen">
             <div class="success-icon">✓</div>
@@ -123,18 +134,16 @@
 </div>
 
 <script>
-    // --- INSIRA SUA NOVA URL DO DEPLOY AQUI ---
-    const API_URL = 'https://script.google.com/macros/s/AKfycbx4yH0RVGtwqrDXkY69meXXljHLIKyIoFrdoPfIwa_E2OhGLoYiUa1pvosm9M7nSKHuQQ/exec';
+    // --- INSIRA SUA NOVA URL AQUI ---
+    const API_URL = 'https://script.google.com/macros/s/AKfycbx8WGCG0nDntXroKFn0k5nHEWSVc0JB1IN_yDxri0DZFtBbZUlua5q29VL5j9ARvfxXiA/exec';
 
     let projectsData = [];
     
-    // Agora carregamos APENAS os projetos ao iniciar
     window.onload = function() {
         fetchProjects();
     };
 
-    // --- LÓGICA PASSO 1 ---
-
+    // --- PROJETOS ---
     async function fetchProjects() {
         try {
             const res = await fetch(`${API_URL}?action=getProjetos`);
@@ -158,6 +167,7 @@
         projects.forEach(p => {
             const div = document.createElement('div');
             div.className = 'project-option';
+            // Exibimos o ID limpo que veio do backend
             div.innerHTML = `<strong>${p.id}</strong><small>${p.projeto}</small>`;
             div.onclick = () => selectProject(p);
             list.appendChild(div);
@@ -181,6 +191,7 @@
     searchInput.addEventListener('blur', () => { setTimeout(() => projectList.style.display = 'none', 200); });
 
     function selectProject(projectObj) {
+        // Preenche input apenas com o ID limpo (ex: 798)
         searchInput.value = projectObj.id;
         document.getElementById('selectedProjectId').value = projectObj.id;
         document.getElementById('selectedProjectName').value = projectObj.projeto;
@@ -189,37 +200,33 @@
         feedback.style.display = 'block';
         feedback.innerHTML = `✅ Solicitando para: <strong>${projectObj.projeto}</strong>`;
         
+        // Preenche o coordenador, mas permite edição
         document.getElementById('userName').value = projectObj.coord;
+        
         projectList.style.display = 'none';
     }
 
-    // --- NAVEGAÇÃO ENTRE PASSOS ---
-
+    // --- NAVEGAÇÃO ---
     function goToStep2() {
-        const projFullId = document.getElementById('selectedProjectId').value; // Ex: "798-Escola" ou apenas "798"
+        const projId = document.getElementById('selectedProjectId').value;
         const projName = document.getElementById('selectedProjectName').value;
         const name = document.getElementById('userName').value;
         const email = document.getElementById('userEmail').value;
 
-        if (!projFullId) return alert("Por favor, selecione um projeto da lista.");
+        if (!projId) return alert("Por favor, selecione um projeto da lista.");
         if (!name || !email) return alert("Preencha todos os campos.");
 
-        // Atualiza Resumo
-        document.getElementById('summaryProject').textContent = `${projFullId} - ${projName}`;
+        document.getElementById('summaryProject').textContent = `${projId} - ${projName}`;
         document.getElementById('summaryUser').textContent = name;
         document.getElementById('summaryEmail').textContent = email;
 
-        // Troca de Tela
         document.getElementById('step1').classList.remove('active');
         document.getElementById('step2').classList.add('active');
         document.getElementById('pageTitle').textContent = "Seleção de Itens";
         document.getElementById('pageSubtitle').textContent = "Passo 2 de 2";
 
-        // *** AQUI É A MÁGICA ***
-        // Extrai apenas o número antes do hífen para filtrar os termos
-        // Se o ID for "798-Construção", pega "798". Se for só "798", pega "798".
-        const cleanId = projFullId.split('-')[0].trim();
-        fetchTerms(cleanId);
+        // O projId já está limpo (ex: 798) graças ao backend
+        fetchTerms(projId);
     }
 
     function backToStep1() {
@@ -228,28 +235,29 @@
         document.getElementById('pageTitle').textContent = "Identificação";
         document.getElementById('pageSubtitle').textContent = "Passo 1 de 2";
         
-        // Limpa a seleção de termo ao voltar, para forçar recarregamento se mudar projeto
         document.getElementById('termSelect').innerHTML = '<option value="" disabled selected>Carregando...</option>';
         document.getElementById('itemsContainer').style.display = 'none';
     }
 
-    // --- LÓGICA DE TERMOS (Dinâmica baseada no Projeto) ---
-
+    // --- TERMOS ---
     async function fetchTerms(projectCode) {
         const select = document.getElementById('termSelect');
         select.innerHTML = '<option value="" disabled selected>Carregando termos...</option>';
         
         try {
-            // Envia o projectCode para a API filtrar
             const res = await fetch(`${API_URL}?action=getTermos&projectCode=${encodeURIComponent(projectCode)}`);
             const data = await res.json();
             
             select.innerHTML = '<option value="" disabled selected>Selecione um termo...</option>';
             
             if (data.termos && data.termos.length > 0) {
-                data.termos.forEach(t => select.innerHTML += `<option value="${t}">${t}</option>`);
+                data.termos.forEach(t => {
+                    // t.full = "943-Lavagem" (Valor oculto)
+                    // t.display = "Lavagem" (Texto visível)
+                    select.innerHTML += `<option value="${t.full}">${t.display}</option>`;
+                });
             } else {
-                select.innerHTML = '<option value="" disabled>Nenhum termo disponível para este projeto</option>';
+                select.innerHTML = '<option value="" disabled>Nenhum termo disponível</option>';
             }
         } catch (e) { 
             console.error(e);
@@ -257,10 +265,9 @@
         }
     }
 
-    // --- RESTO DA LÓGICA (ITENS e ENVIO) MANTIDA IGUAL ---
-
+    // --- ITENS E ENVIO (Igual ao anterior) ---
     document.getElementById('termSelect').addEventListener('change', async function() {
-        const termo = this.value;
+        const termo = this.value; // Aqui usamos o termo COMPLETO (ex: 943-Lavagem)
         const container = document.getElementById('itemsContainer');
         const list = document.getElementById('itemsList');
         const loader = document.getElementById('loadingItems');
@@ -333,9 +340,9 @@
 
         const payload = {
             projeto: document.getElementById('selectedProjectId').value + " - " + document.getElementById('selectedProjectName').value,
-            nome: document.getElementById('userName').value,
+            nome: document.getElementById('userName').value, // Envia o nome que estiver no input (editado ou não)
             email: document.getElementById('userEmail').value,
-            termo: document.getElementById('termSelect').value,
+            termo: document.getElementById('termSelect').value, // Envia o nome completo da aba
             itens: itens
         };
 
