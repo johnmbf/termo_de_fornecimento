@@ -1,14 +1,10 @@
 // --- CONFIGURAÇÃO ---
 // COLE AQUI A SUA URL ATUAL DO APPS SCRIPT
 const API_URL = 'https://script.google.com/macros/s/AKfycbx8WGCG0nDntXroKFn0k5nHEWSVc0JB1IN_yDxri0DZFtBbZUlua5q29VL5j9ARvfxXiA/exec';
-
 let projectsData = [];
 
-// Inicialização ao carregar a página
 document.addEventListener('DOMContentLoaded', function() {
     fetchProjects();
-    
-    // Configura os listeners de evento aqui para garantir que o DOM existe
     setupEventListeners();
 });
 
@@ -36,36 +32,9 @@ function setupEventListeners() {
             setTimeout(() => projectList.style.display = 'none', 200); 
         });
     }
-
-    // Mudança de Termo
-    const termSelect = document.getElementById('termSelect');
-    if(termSelect) {
-        termSelect.addEventListener('change', async function() {
-            const termo = this.value;
-            const container = document.getElementById('itemsContainer');
-            const list = document.getElementById('itemsList');
-            const loader = document.getElementById('loadingItems');
-    
-            container.style.display = 'none';
-            loader.style.display = 'block';
-            list.innerHTML = '';
-    
-            try {
-                const res = await fetch(`${API_URL}?action=getItens&termo=${encodeURIComponent(termo)}`);
-                const data = await res.json();
-                if(data.itens && data.itens.length > 0) {
-                    renderItems(data.itens, list);
-                    container.style.display = 'block';
-                } else {
-                    alert("Nenhum item disponível.");
-                }
-            } catch(e) { console.error(e); } 
-            finally { loader.style.display = 'none'; }
-        });
-    }
 }
 
-// --- FUNÇÕES DE BUSCA ---
+// --- FUNÇÕES DE BUSCA PROJETO ---
 
 async function fetchProjects() {
     try {
@@ -79,15 +48,12 @@ async function fetchProjects() {
         } else {
             list.innerHTML = '<div class="project-option">Nenhum projeto carregado.</div>';
         }
-    } catch (e) { 
-        console.error(e); 
-    }
+    } catch (e) { console.error(e); }
 }
 
 function renderProjectList(projects) {
     const list = document.getElementById('projectList');
     if(!list) return;
-    
     list.innerHTML = '';
     if (projects.length === 0) {
         list.innerHTML = '<div class="project-option">Projeto não encontrado.</div>';
@@ -115,7 +81,6 @@ function selectProject(projectObj) {
     feedback.innerHTML = `✅ Solicitando para: <strong>${projectObj.projeto}</strong>`;
     
     document.getElementById('userName').value = projectObj.coord;
-    
     projectList.style.display = 'none';
 }
 
@@ -148,32 +113,76 @@ window.backToStep1 = function() {
     document.getElementById('pageTitle').textContent = "Identificação";
     document.getElementById('pageSubtitle').textContent = "Passo 1 de 2";
     
-    document.getElementById('termSelect').innerHTML = '<option value="" disabled selected>Carregando...</option>';
+    // Limpa seleções anteriores
+    document.getElementById('termGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #999;">Carregando...</div>';
+    document.getElementById('selectedTermValue').value = "";
     document.getElementById('itemsContainer').style.display = 'none';
 }
 
+// --- LÓGICA DE TERMOS (Blocos) ---
+
 async function fetchTerms(projectCode) {
-    const select = document.getElementById('termSelect');
-    select.innerHTML = '<option value="" disabled selected>Carregando termos...</option>';
+    const grid = document.getElementById('termGrid');
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #999;">Carregando termos disponíveis...</div>';
     
     try {
         const res = await fetch(`${API_URL}?action=getTermos&projectCode=${encodeURIComponent(projectCode)}`);
         const data = await res.json();
         
-        select.innerHTML = '<option value="" disabled selected>Selecione um termo...</option>';
+        grid.innerHTML = ''; // Limpa loading
         
         if (data.termos && data.termos.length > 0) {
             data.termos.forEach(t => {
-                select.innerHTML += `<option value="${t.full}">${t.display}</option>`;
+                // Cria o Card
+                const card = document.createElement('div');
+                card.className = 'term-card';
+                card.textContent = t.display; // Mostra "Alimentos"
+                
+                // Evento de Clique no Card
+                card.onclick = () => selectTermBlock(card, t.full);
+                
+                grid.appendChild(card);
             });
         } else {
-            select.innerHTML = '<option value="" disabled>Nenhum termo disponível</option>';
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;">Nenhum termo disponível para este projeto</div>';
         }
     } catch (e) { 
         console.error(e);
-        select.innerHTML = '<option value="" disabled>Erro ao carregar</option>';
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: red;">Erro ao carregar termos</div>';
     }
 }
+
+// Função quando clica no bloco
+async function selectTermBlock(element, fullTermName) {
+    // Visual: remove 'selected' de todos e adiciona no clicado
+    document.querySelectorAll('.term-card').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+
+    // Lógica: Salva o valor no input oculto
+    document.getElementById('selectedTermValue').value = fullTermName;
+
+    // Busca Itens
+    const container = document.getElementById('itemsContainer');
+    const list = document.getElementById('itemsList');
+    const loader = document.getElementById('loadingItems');
+
+    container.style.display = 'none';
+    loader.style.display = 'block';
+    list.innerHTML = '';
+
+    try {
+        const res = await fetch(`${API_URL}?action=getItens&termo=${encodeURIComponent(fullTermName)}`);
+        const data = await res.json();
+        if(data.itens && data.itens.length > 0) {
+            renderItems(data.itens, list);
+            container.style.display = 'block';
+        } else {
+            alert("Nenhum item disponível neste termo.");
+        }
+    } catch(e) { console.error(e); } 
+    finally { loader.style.display = 'none'; }
+}
+
 
 // --- ITENS E ENVIO ---
 
@@ -212,6 +221,10 @@ window.submitOrder = async function() {
     const checks = document.querySelectorAll('.chk:checked');
     if(checks.length === 0) return alert("Selecione itens.");
     
+    // Verifica se escolheu um termo
+    const termoSelecionado = document.getElementById('selectedTermValue').value;
+    if(!termoSelecionado) return alert("Selecione um termo de fornecimento.");
+
     const itens = [];
     let valid = true;
     checks.forEach(c => {
@@ -230,7 +243,7 @@ window.submitOrder = async function() {
         projeto: document.getElementById('selectedProjectId').value + " - " + document.getElementById('selectedProjectName').value,
         nome: document.getElementById('userName').value,
         email: document.getElementById('userEmail').value,
-        termo: document.getElementById('termSelect').value,
+        termo: termoSelecionado, // Usa o valor do input oculto
         itens: itens
     };
 
