@@ -3,238 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Materiais</title>
+    <title>Portal de Fornecimento</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f3f4f6; --card: #ffffff; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        h1 { color: #1f2937; margin-bottom: 20px; font-size: 1.8em; }
-        p { color: #666; margin-bottom: 30px; }
+        :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 800px; background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: relative; }
         
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9em; color: #4b5563; }
-        input[type="text"], input[type="email"], select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        input:focus, select:focus { outline: 2px solid var(--primary); border-color: transparent; }
+        /* Cabeçalho */
+        .header { margin-bottom: 30px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; }
+        h1 { margin: 0; color: #1e293b; font-size: 1.5rem; }
+        p.subtitle { color: #64748b; margin: 5px 0 0 0; font-size: 0.9rem; }
+        
+        /* Controle de Steps */
+        .step-content { display: none; animation: fadeIn 0.4s ease; }
+        .step-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 20px; position: relative; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: #475569; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; transition: all 0.2s; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        input[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; } /* Estilo para campo auto-preenchido se quiser bloquear */
+        
+        /* Feedback do Projeto */
+        .project-feedback {
+            margin-top: 8px;
+            padding: 10px;
+            background-color: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none; /* Escondido por padrão */
+        }
+
+        /* Searchable Dropdown */
+        .search-wrapper { position: relative; }
+        .project-list { 
+            position: absolute; top: 100%; left: 0; right: 0; 
+            background: white; border: 1px solid #cbd5e1; border-top: none; 
+            border-radius: 0 0 6px 6px; max-height: 200px; overflow-y: auto; 
+            z-index: 10; display: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
+        }
+        .project-option { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+        .project-option:hover { background-color: #eff6ff; color: var(--primary); }
+        .project-option strong { display: block; color: #1e293b; }
+        .project-option small { color: #64748b; }
 
         /* Tabela de Itens */
-        .items-container { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; display: none; margin-top: 20px; }
-        .item-row { display: grid; grid-template-columns: 40px 2fr 1fr 1fr 1fr; gap: 10px; padding: 15px; border-bottom: 1px solid #f3f4f6; align-items: center; }
-        .item-row:last-child { border-bottom: none; }
-        .item-header { background: #f9fafb; font-weight: bold; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .items-header { display: grid; grid-template-columns: 40px 2fr 1fr 1fr 1fr; gap: 10px; padding: 10px; background: #f1f5f9; font-weight: bold; font-size: 0.85rem; border-radius: 6px 6px 0 0; }
+        .item-row { display: grid; grid-template-columns: 40px 2fr 1fr 1fr 1fr; gap: 10px; padding: 15px 10px; border-bottom: 1px solid #e2e8f0; align-items: center; }
         
-        input[type="number"] { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; }
-        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 14px 28px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; }
+        .btn:hover { background-color: #1d4ed8; }
+        .btn-secondary { background-color: #64748b; margin-top: 10px; }
         
-        .price-display { font-weight: bold; color: var(--primary); }
-        .stock-info { font-size: 0.8em; color: #6b7280; }
-        
-        button.btn-submit { background-color: var(--primary); color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 25px; transition: background 0.2s; }
-        button.btn-submit:hover { background-color: #1d4ed8; }
-        button:disabled { background-color: #9ca3af; cursor: not-allowed; }
-        
-        .loading { text-align: center; padding: 20px; color: #6b7280; }
-        
-        /* Responsividade */
+        .user-summary { background: #eff6ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bfdbfe; color: #1e40af; font-size: 0.9rem; }
+        .loading { text-align: center; color: #64748b; padding: 20px; }
+
         @media (max-width: 600px) {
-            .item-row { grid-template-columns: 40px 1fr; grid-auto-rows: auto; gap: 5px; }
-            .col-details { grid-column: 2; font-size: 0.9em; }
-            .stock-info { grid-column: 2; margin-bottom: 5px; }
-            .col-actions { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; align-items: center;}
-            .item-header { display: none; }
+            .items-header { display: none; }
+            .item-row { grid-template-columns: 30px 1fr; gap: 5px; }
+            .col-details { grid-column: 2; }
+            .col-actions { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Solicitação de Materiais</h1>
-    <p>Preencha os dados do projeto e selecione os itens necessários.</p>
+    <div class="header">
+        <h1 id="pageTitle">Identificação</h1>
+        <p class="subtitle" id="pageSubtitle">Passo 1 de 2</p>
+    </div>
 
-    <form id="orderForm">
-        <!-- Dados do Usuário e Projeto -->
-        <div class="form-group">
-            <label>Projeto</label>
-            <input type="text" id="userProject" required placeholder="Número do projeto">
+    <!-- TELA 1 -->
+    <div id="step1" class="step-content active">
+        <div class="form-group search-wrapper">
+            <label>Código do Projeto</label>
+            <input type="text" id="projectSearch" placeholder="Digite o código ou nome do projeto..." autocomplete="off">
+            <div id="projectList" class="project-list">
+                <div class="project-option" style="color: #999;">Carregando projetos...</div>
+            </div>
+            
+            <!-- Feedback Visual -->
+            <div id="projectFeedback" class="project-feedback"></div>
+            
+            <input type="hidden" id="selectedProjectId">
+            <input type="hidden" id="selectedProjectName">
         </div>
-        
+
         <div class="form-group">
-            <label>Seu Nome Completo</label>
-            <input type="text" id="userName" required placeholder="Ex: João Silva">
+            <label>Coordenador / Solicitante</label>
+            <!-- Este campo será preenchido automaticamente -->
+            <input type="text" id="userName" placeholder="Preenchimento automático..." >
         </div>
-        
+
         <div class="form-group">
             <label>Seu E-mail</label>
-            <input type="email" id="userEmail" required placeholder="Ex: joao@empresa.com">
+            <input type="email" id="userEmail" placeholder="seu@email.com">
         </div>
 
-        <!-- Seleção do Termo -->
+        <button class="btn" onclick="goToStep2()">Continuar</button>
+    </div>
+
+    <!-- TELA 2 -->
+    <div id="step2" class="step-content">
+        <div class="user-summary">
+            <strong>Projeto:</strong> <span id="summaryProject"></span><br>
+            <strong>Responsável:</strong> <span id="summaryUser"></span> (<span id="summaryEmail"></span>)
+        </div>
+
         <div class="form-group">
             <label>Termo de Fornecimento</label>
-            <select id="termSelect" required>
+            <select id="termSelect">
                 <option value="" disabled selected>Carregando termos...</option>
             </select>
         </div>
 
-        <!-- Lista Dinâmica -->
-        <div id="itemsContainer" class="items-container">
-            <div class="item-row item-header">
+        <div id="itemsContainer" style="display:none;">
+            <div class="items-header">
                 <div></div>
                 <div>Item</div>
-                <div>Estoque</div>
-                <div>Qtd</div>
+                <div>Disp.</div>
+                <div>Qtd.</div>
                 <div>Total</div>
             </div>
             <div id="itemsList"></div>
         </div>
         
-        <div id="loadingItems" class="loading" style="display: none;">Carregando itens...</div>
+        <div id="loadingItems" class="loading" style="display:none;">Buscando itens...</div>
 
-        <button type="submit" class="btn-submit" id="btnSubmit">Enviar Solicitação</button>
-    </form>
+        <button class="btn" id="btnSubmit" onclick="submitOrder()">Finalizar Solicitação</button>
+        <button class="btn btn-secondary" onclick="backToStep1()">Voltar</button>
+    </div>
 </div>
 
 <script>
-    // --- INSIRA SUA URL DO APPS SCRIPT AQUI ---
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzxoyfht1gJ53vD5gU6Jp7OeC9hP3NJI8bz9b-qo1lFUXEo1xYZW01bgStKyY2taw8kZg/exec'; 
+    // --- INSIRA A NOVA URL AQUI ---
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwokjId0MCGP9sx_cXRe1CYUL_28seR7o8dsWy5fdLw1UnkKMTTZ6mbL_u1DRRaSXWg1Q/exec';
 
-    const termSelect = document.getElementById('termSelect');
-    const itemsContainer = document.getElementById('itemsContainer');
-    const itemsList = document.getElementById('itemsList');
-    const loadingItems = document.getElementById('loadingItems');
-    const btnSubmit = document.getElementById('btnSubmit');
+    let projectsData = []; // [{id, projeto, coord}, ...]
+    
+    window.onload = function() {
+        fetchProjects();
+        fetchTerms();
+    };
 
-    // Inicialização
-    async function loadTerms() {
+    // --- LÓGICA PASSO 1 ---
+
+    async function fetchProjects() {
         try {
-            const response = await fetch(`${API_URL}?action=getTermos`);
-            const data = await response.json();
-            termSelect.innerHTML = '<option value="" disabled selected>Selecione um termo...</option>';
-            data.termos.forEach(t => {
-                const opt = document.createElement('option');
-                opt.value = t;
-                opt.textContent = t;
-                termSelect.appendChild(opt);
-            });
-        } catch (e) {
-            console.error(e);
-            alert("Erro ao conectar com a planilha.");
-        }
+            const res = await fetch(`${API_URL}?action=getProjetos`);
+            const data = await res.json();
+            
+            if (data.projetos && data.projetos.length > 0) {
+                projectsData = data.projetos;
+                renderProjectList(projectsData);
+            } else {
+                document.getElementById('projectList').innerHTML = '<div class="project-option">Nenhum projeto carregado.</div>';
+            }
+        } catch (e) { console.error(e); }
     }
 
-    // Mudança de Termo
-    termSelect.addEventListener('change', async function() {
-        const termo = this.value;
-        if (!termo) return;
+    // Renderiza a lista (pode ser filtrada)
+    function renderProjectList(projects) {
+        const list = document.getElementById('projectList');
+        list.innerHTML = '';
+        
+        if (projects.length === 0) {
+            list.innerHTML = '<div class="project-option">Projeto não encontrado.</div>';
+            return;
+        }
 
-        itemsContainer.style.display = 'none';
-        loadingItems.style.display = 'block';
-        itemsList.innerHTML = '';
+        projects.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'project-option';
+            // Mostra Código e Nome na lista
+            div.innerHTML = `<strong>${p.id}</strong><small>${p.projeto}</small>`;
+            div.onclick = () => selectProject(p);
+            list.appendChild(div);
+        });
+    }
 
-        try {
-            const response = await fetch(`${API_URL}?action=getItens&termo=${encodeURIComponent(termo)}`);
-            const data = await response.json();
+    // Filtro de pesquisa (busca por ID ou Nome)
+    const searchInput = document.getElementById('projectSearch');
+    const projectList = document.getElementById('projectList');
 
-            if (data.itens && data.itens.length > 0) {
-                renderItems(data.itens);
-                itemsContainer.style.display = 'block';
-            } else {
-                alert("Nenhum item disponível neste termo.");
-            }
-        } catch (e) { console.error(e); } 
-        finally { loadingItems.style.display = 'none'; }
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        projectList.style.display = 'block';
+        
+        // Filtra o array original
+        const filtered = projectsData.filter(p => 
+            String(p.id).toLowerCase().includes(term) || 
+            p.projeto.toLowerCase().includes(term)
+        );
+        
+        renderProjectList(filtered);
     });
 
-    function renderItems(items) {
-        items.forEach(item => {
+    searchInput.addEventListener('focus', () => {
+        if(projectsData.length > 0) projectList.style.display = 'block';
+    });
+    
+    // Pequeno delay para permitir o clique
+    searchInput.addEventListener('blur', () => {
+        setTimeout(() => projectList.style.display = 'none', 200);
+    });
+
+    // AÇÃO AO SELECIONAR PROJETO
+    function selectProject(projectObj) {
+        // 1. Preenche o input de busca com o Código
+        searchInput.value = projectObj.id;
+        
+        // 2. Guarda dados ocultos
+        document.getElementById('selectedProjectId').value = projectObj.id;
+        document.getElementById('selectedProjectName').value = projectObj.projeto;
+        
+        // 3. Mostra Feedback Visual
+        const feedback = document.getElementById('projectFeedback');
+        feedback.style.display = 'block';
+        feedback.innerHTML = `✅ Solicitando itens para o Projeto: <strong>${projectObj.projeto}</strong>`;
+        
+        // 4. Preenche Automaticamente o Coordenador
+        const nameInput = document.getElementById('userName');
+        nameInput.value = projectObj.coord;
+        
+        // Esconde lista
+        projectList.style.display = 'none';
+    }
+
+    // --- NAVEGAÇÃO ---
+
+    function goToStep2() {
+        const projId = document.getElementById('selectedProjectId').value;
+        const projName = document.getElementById('selectedProjectName').value;
+        const name = document.getElementById('userName').value;
+        const email = document.getElementById('userEmail').value;
+
+        if (!projId) return alert("Por favor, selecione um projeto da lista.");
+        if (!name || !email) return alert("Preencha todos os campos.");
+
+        // Preenche resumo
+        document.getElementById('summaryProject').textContent = `${projId} - ${projName}`;
+        document.getElementById('summaryUser').textContent = name;
+        document.getElementById('summaryEmail').textContent = email;
+
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+        document.getElementById('pageTitle').textContent = "Seleção de Itens";
+        document.getElementById('pageSubtitle').textContent = "Passo 2 de 2";
+    }
+
+    function backToStep1() {
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step1').classList.add('active');
+        document.getElementById('pageTitle').textContent = "Identificação";
+        document.getElementById('pageSubtitle').textContent = "Passo 1 de 2";
+    }
+
+    // --- LÓGICA PASSO 2 (TERMOS E ITENS) ---
+    // (A lógica aqui é a mesma da versão anterior, só garantindo que funcione com o novo layout)
+
+    async function fetchTerms() {
+        try {
+            const res = await fetch(`${API_URL}?action=getTermos`);
+            const data = await res.json();
+            const select = document.getElementById('termSelect');
+            select.innerHTML = '<option value="" disabled selected>Selecione um termo...</option>';
+            data.termos.forEach(t => select.innerHTML += `<option value="${t}">${t}</option>`);
+        } catch (e) { console.error(e); }
+    }
+
+    document.getElementById('termSelect').addEventListener('change', async function() {
+        const termo = this.value;
+        const container = document.getElementById('itemsContainer');
+        const list = document.getElementById('itemsList');
+        const loader = document.getElementById('loadingItems');
+
+        container.style.display = 'none';
+        loader.style.display = 'block';
+        list.innerHTML = '';
+
+        try {
+            const res = await fetch(`${API_URL}?action=getItens&termo=${encodeURIComponent(termo)}`);
+            const data = await res.json();
+            
+            if(data.itens && data.itens.length > 0) {
+                renderItems(data.itens, list);
+                container.style.display = 'block';
+            } else {
+                alert("Nenhum item disponível.");
+            }
+        } catch(e) { console.error(e); } 
+        finally { loader.style.display = 'none'; }
+    });
+
+    function renderItems(itens, container) {
+        itens.forEach(item => {
+            const preco = item.preco.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
             const row = document.createElement('div');
             row.className = 'item-row';
-            const precoFmt = item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
             row.innerHTML = `
-                <div><input type="checkbox" class="item-check" data-id="${item.id}"></div>
-                <div class="col-details">
-                    <strong>${item.nome}</strong><br>
-                    <small>${item.unidade} | ${precoFmt}/un</small>
-                </div>
-                <div class="stock-info">Disp: ${item.disponivel}</div>
-                <div class="col-actions">
-                    <input type="number" class="item-qty" id="qty-${item.id}" min="1" max="${item.disponivel}" disabled placeholder="0">
-                </div>
-                <div class="price-display" id="total-${item.id}">R$ 0,00</div>
+                <div><input type="checkbox" class="chk" data-id="${item.id}"></div>
+                <div class="col-details"><strong>${item.nome}</strong><br><small>${item.unidade} | ${preco}</small></div>
+                <div class="col-meta">Disp: ${item.disponivel}</div>
+                <div class="col-actions"><input type="number" id="qty-${item.id}" disabled min="1" max="${item.disponivel}"></div>
+                <div class="price-display" id="total-${item.id}">-</div>
             `;
-            itemsList.appendChild(row);
+            container.appendChild(row);
 
-            // Eventos
-            const check = row.querySelector('.item-check');
-            const qty = row.querySelector('.item-qty');
+            const chk = row.querySelector('.chk');
+            const qty = row.querySelector(`#qty-${item.id}`);
             const total = row.querySelector(`#total-${item.id}`);
 
-            check.addEventListener('change', () => {
-                qty.disabled = !check.checked;
-                if (!check.checked) { qty.value = ''; total.textContent = 'R$ 0,00'; }
-                else qty.focus();
+            chk.addEventListener('change', () => {
+                qty.disabled = !chk.checked;
+                if(chk.checked) qty.focus(); else { qty.value = ''; total.textContent = '-'; }
             });
 
             qty.addEventListener('input', () => {
-                let val = parseInt(qty.value);
-                const max = parseInt(qty.getAttribute('max'));
-                if (val > max) { val = max; qty.value = max; alert(`Máximo: ${max}`); }
-                if (val < 0) qty.value = 1;
-                
-                const custo = (val || 0) * item.preco;
-                total.textContent = custo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                let v = parseInt(qty.value);
+                if(v > item.disponivel) { v = item.disponivel; qty.value = v; alert("Máximo atingido"); }
+                total.textContent = ((v||0) * item.preco).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
             });
         });
     }
 
-    // Envio
-    document.getElementById('orderForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    async function submitOrder() {
+        const checks = document.querySelectorAll('.chk:checked');
+        if(checks.length === 0) return alert("Selecione itens.");
         
-        const selected = [];
-        const checks = document.querySelectorAll('.item-check:checked');
-        
-        if (checks.length === 0) return alert("Selecione pelo menos um item.");
-
+        const itens = [];
         let valid = true;
-        checks.forEach(chk => {
-            const id = chk.dataset.id;
-            const qtd = parseInt(document.getElementById(`qty-${id}`).value);
-            if (!qtd || qtd <= 0) valid = false;
-            selected.push({ linha: id, qtd: qtd });
+        checks.forEach(c => {
+            const id = c.dataset.id;
+            const q = document.getElementById(`qty-${id}`).value;
+            if(!q || q<1) valid = false;
+            itens.push({ linha: id, qtd: q });
         });
+        if(!valid) return alert("Verifique quantidades.");
 
-        if (!valid) return alert("Verifique as quantidades.");
+        const btn = document.getElementById('btnSubmit');
+        btn.innerText = "Enviando...";
+        btn.disabled = true;
 
         const payload = {
-            projeto: document.getElementById('userProject').value, // Novo Campo
+            projeto: document.getElementById('selectedProjectId').value + " - " + document.getElementById('selectedProjectName').value,
             nome: document.getElementById('userName').value,
             email: document.getElementById('userEmail').value,
-            termo: termSelect.value,
-            itens: selected
+            termo: document.getElementById('termSelect').value,
+            itens: itens
         };
-
-        btnSubmit.innerText = "Processando...";
-        btnSubmit.disabled = true;
 
         try {
             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
             const json = await res.json();
-            
-            if (json.status === 'sucesso') {
-                alert("Sucesso! Pedido realizado.");
-                window.location.reload();
-            } else {
-                throw new Error(json.mensagem);
-            }
-        } catch (err) {
-            alert("Erro: " + err.message);
-            btnSubmit.innerText = "Enviar Solicitação";
-            btnSubmit.disabled = false;
+            if(json.status === 'sucesso') { alert("Sucesso!"); location.reload(); }
+            else throw new Error(json.mensagem);
+        } catch(e) {
+            alert("Erro: " + e.message);
+            btn.innerText = "Finalizar Solicitação";
+            btn.disabled = false;
         }
-    });
-
-    loadTerms();
+    }
 </script>
+
 </body>
 </html>
