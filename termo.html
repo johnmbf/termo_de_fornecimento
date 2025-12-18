@@ -18,7 +18,6 @@
     <div id="step1" class="step-content active">
         <div class="form-group search-wrapper">
             <label>Código do Projeto</label>
-            <!-- REMOVIDO TEXTO DO PLACEHOLDER -->
             <input type="text" id="projectSearch" placeholder="" autocomplete="off">
             
             <div id="projectList" class="project-list">
@@ -52,11 +51,13 @@
 
         <div class="form-group">
             <label>Selecione o Termo de Fornecimento:</label>
-            <!-- AQUI: Troca do Select pelo Grid de Blocos -->
+            
+            <!-- ESTA PARTE É CRUCIAL PARA CORRIGIR O ERRO -->
             <div id="termGrid" class="term-grid">
                 <div style="grid-column: 1/-1; text-align: center; color: #999;">Carregando termos...</div>
             </div>
-            <!-- Input oculto para guardar qual termo foi clicado -->
+            
+            <!-- Input oculto para guardar o valor selecionado -->
             <input type="hidden" id="selectedTermValue">
         </div>
 
