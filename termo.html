@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitação de Itens</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="header" id="mainHeader">
+        <h1 id="pageTitle">Identificação</h1>
+        <p class="subtitle" id="pageSubtitle">Passo 1 de 2</p>
+    </div>
+
+    <!-- PASSO 1 -->
+    <div id="step1" class="step-content active">
+        <div class="form-group search-wrapper">
+            <label>Código do Projeto</label>
+            <input type="text" id="projectSearch" placeholder="Digite o código (ex: 798) ou nome..." autocomplete="off">
+            <div id="projectList" class="project-list">
+                <div class="project-option" style="color: #999;">Carregando projetos...</div>
+            </div>
+            <div id="projectFeedback" class="project-feedback"></div>
+            <input type="hidden" id="selectedProjectId">
+            <input type="hidden" id="selectedProjectName">
+        </div>
+
+        <div class="form-group">
+            <label>Coordenador / Solicitante</label>
+            <input type="text" id="userName" placeholder="Será preenchido automaticamente...">
+        </div>
+
+        <div class="form-group">
+            <label>Seu E-mail</label>
+            <input type="email" id="userEmail" placeholder="seu@email.com">
+        </div>
+
+        <button class="btn" onclick="goToStep2()">Continuar</button>
+        <!-- Botão Voltar para o Menu -->
+        <a href="index.html" class="btn btn-secondary" style="text-align:center; display:block; margin-top:10px;">Voltar ao Menu</a>
+    </div>
+
+    <!-- PASSO 2 -->
+    <div id="step2" class="step-content">
+        <div class="user-summary">
+            <strong>Projeto:</strong> <span id="summaryProject"></span><br>
+            <strong>Responsável:</strong> <span id="summaryUser"></span> (<span id="summaryEmail"></span>)
+        </div>
+
+        <div class="form-group">
+            <label>Termo de Fornecimento</label>
+            <select id="termSelect">
+                <option value="" disabled selected>Carregando termos...</option>
+            </select>
+        </div>
+
+        <div id="itemsContainer" style="display:none;">
+            <div class="items-header">
+                <div></div>
+                <div>Item</div>
+                <div>Disp.</div>
+                <div>Qtd.</div>
+                <div>Total</div>
+            </div>
+            <div id="itemsList"></div>
+        </div>
+        
+        <div id="loadingItems" class="loading" style="display:none;">Buscando itens...</div>
+
+        <button class="btn" id="btnSubmit" onclick="submitOrder()">Finalizar Solicitação</button>
+        <button class="btn btn-secondary" onclick="backToStep1()">Voltar</button>
+    </div>
+
+    <!-- PASSO 3 -->
+    <div id="step3" class="step-content">
+        <div class="success-screen">
+            <div class="success-icon">✓</div>
+            <h2>Pedido Enviado!</h2>
+            <p>Sua solicitação foi registrada com sucesso.<br>O estoque foi atualizado automaticamente.</p>
+            <button class="btn" onclick="location.reload()">Fazer Nova Solicitação</button>
+            <a href="index.html" class="btn btn-secondary">Voltar ao Menu Principal</a>
+        </div>
+    </div>
+</div>
+
+<!-- Link para o Javascript separado -->
+<script src="js/termo.js"></script>
+
+</body>
+</html>
