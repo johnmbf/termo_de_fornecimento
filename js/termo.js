@@ -1,6 +1,7 @@
 // --- CONFIGURAÇÃO ---
 // COLE AQUI A SUA URL ATUAL DO APPS SCRIPT
 const API_URL = 'https://script.google.com/macros/s/AKfycbx8WGCG0nDntXroKFn0k5nHEWSVc0JB1IN_yDxri0DZFtBbZUlua5q29VL5j9ARvfxXiA/exec';
+
 let projectsData = [];
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -113,8 +114,12 @@ window.backToStep1 = function() {
     document.getElementById('pageTitle').textContent = "Identificação";
     document.getElementById('pageSubtitle').textContent = "Passo 1 de 2";
     
-    // Limpa seleções anteriores
-    document.getElementById('termGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #999;">Carregando...</div>';
+    // Tenta limpar o grid se ele existir
+    const grid = document.getElementById('termGrid');
+    if (grid) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #999;">Carregando...</div>';
+    }
+    
     document.getElementById('selectedTermValue').value = "";
     document.getElementById('itemsContainer').style.display = 'none';
 }
@@ -123,24 +128,28 @@ window.backToStep1 = function() {
 
 async function fetchTerms(projectCode) {
     const grid = document.getElementById('termGrid');
+    
+    // PROTEÇÃO CONTRA O ERRO RELATADO
+    if (!grid) {
+        console.error("ERRO CRÍTICO: Elemento 'termGrid' não encontrado no HTML. Verifique se o arquivo termo.html foi atualizado.");
+        alert("Erro no sistema: Interface desatualizada (Falta #termGrid).");
+        return;
+    }
+
     grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #999;">Carregando termos disponíveis...</div>';
     
     try {
         const res = await fetch(`${API_URL}?action=getTermos&projectCode=${encodeURIComponent(projectCode)}`);
         const data = await res.json();
         
-        grid.innerHTML = ''; // Limpa loading
+        grid.innerHTML = ''; 
         
         if (data.termos && data.termos.length > 0) {
             data.termos.forEach(t => {
-                // Cria o Card
                 const card = document.createElement('div');
                 card.className = 'term-card';
-                card.textContent = t.display; // Mostra "Alimentos"
-                
-                // Evento de Clique no Card
+                card.textContent = t.display; 
                 card.onclick = () => selectTermBlock(card, t.full);
-                
                 grid.appendChild(card);
             });
         } else {
@@ -152,16 +161,12 @@ async function fetchTerms(projectCode) {
     }
 }
 
-// Função quando clica no bloco
 async function selectTermBlock(element, fullTermName) {
-    // Visual: remove 'selected' de todos e adiciona no clicado
     document.querySelectorAll('.term-card').forEach(el => el.classList.remove('selected'));
     element.classList.add('selected');
 
-    // Lógica: Salva o valor no input oculto
     document.getElementById('selectedTermValue').value = fullTermName;
 
-    // Busca Itens
     const container = document.getElementById('itemsContainer');
     const list = document.getElementById('itemsList');
     const loader = document.getElementById('loadingItems');
@@ -182,9 +187,6 @@ async function selectTermBlock(element, fullTermName) {
     } catch(e) { console.error(e); } 
     finally { loader.style.display = 'none'; }
 }
-
-
-// --- ITENS E ENVIO ---
 
 function renderItems(itens, container) {
     itens.forEach(item => {
@@ -221,7 +223,6 @@ window.submitOrder = async function() {
     const checks = document.querySelectorAll('.chk:checked');
     if(checks.length === 0) return alert("Selecione itens.");
     
-    // Verifica se escolheu um termo
     const termoSelecionado = document.getElementById('selectedTermValue').value;
     if(!termoSelecionado) return alert("Selecione um termo de fornecimento.");
 
@@ -243,7 +244,7 @@ window.submitOrder = async function() {
         projeto: document.getElementById('selectedProjectId').value + " - " + document.getElementById('selectedProjectName').value,
         nome: document.getElementById('userName').value,
         email: document.getElementById('userEmail').value,
-        termo: termoSelecionado, // Usa o valor do input oculto
+        termo: termoSelecionado,
         itens: itens
     };
 
