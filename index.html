@@ -3,65 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Fornecimento</title>
+    <title>Portal de Solicitação de Itens</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; }
+        /* (MANTIVE O MESMO CSS PARA NÃO QUEBRAR O LAYOUT) */
+        :root { --primary: #2563eb; --success: #10b981; --bg: #f8fafc; --card: #ffffff; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 800px; background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: relative; }
-        
-        /* Cabeçalho */
+        .container { width: 100%; max-width: 800px; background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: relative; min-height: 400px; }
         .header { margin-bottom: 30px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; }
         h1 { margin: 0; color: #1e293b; font-size: 1.5rem; }
         p.subtitle { color: #64748b; margin: 5px 0 0 0; font-size: 0.9rem; }
-        
-        /* Controle de Steps */
         .step-content { display: none; animation: fadeIn 0.4s ease; }
         .step-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Form Elements */
         .form-group { margin-bottom: 20px; position: relative; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: #475569; }
         input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; transition: all 0.2s; }
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        input[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; } /* Estilo para campo auto-preenchido se quiser bloquear */
-        
-        /* Feedback do Projeto */
-        .project-feedback {
-            margin-top: 8px;
-            padding: 10px;
-            background-color: #ecfdf5;
-            color: #047857;
-            border: 1px solid #a7f3d0;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            display: none; /* Escondido por padrão */
-        }
-
-        /* Searchable Dropdown */
+        input[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; }
+        .project-feedback { margin-top: 8px; padding: 10px; background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 6px; font-size: 0.9rem; display: none; }
         .search-wrapper { position: relative; }
-        .project-list { 
-            position: absolute; top: 100%; left: 0; right: 0; 
-            background: white; border: 1px solid #cbd5e1; border-top: none; 
-            border-radius: 0 0 6px 6px; max-height: 200px; overflow-y: auto; 
-            z-index: 10; display: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
-        }
+        .project-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; border-top: none; border-radius: 0 0 6px 6px; max-height: 200px; overflow-y: auto; z-index: 10; display: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .project-option { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
         .project-option:hover { background-color: #eff6ff; color: var(--primary); }
         .project-option strong { display: block; color: #1e293b; }
         .project-option small { color: #64748b; }
-
-        /* Tabela de Itens */
         .items-header { display: grid; grid-template-columns: 40px 2fr 1fr 1fr 1fr; gap: 10px; padding: 10px; background: #f1f5f9; font-weight: bold; font-size: 0.85rem; border-radius: 6px 6px 0 0; }
         .item-row { display: grid; grid-template-columns: 40px 2fr 1fr 1fr 1fr; gap: 10px; padding: 15px 10px; border-bottom: 1px solid #e2e8f0; align-items: center; }
-        
         .btn { background-color: var(--primary); color: white; border: none; padding: 14px 28px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; }
         .btn:hover { background-color: #1d4ed8; }
         .btn-secondary { background-color: #64748b; margin-top: 10px; }
-        
         .user-summary { background: #eff6ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bfdbfe; color: #1e40af; font-size: 0.9rem; }
         .loading { text-align: center; color: #64748b; padding: 20px; }
-
+        .success-screen { text-align: center; padding: 40px 20px; }
+        .success-icon { width: 80px; height: 80px; background: #d1fae5; color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 40px; }
+        .success-screen h2 { color: #065f46; margin-bottom: 10px; }
+        .success-screen p { color: #6b7280; margin-bottom: 30px; }
         @media (max-width: 600px) {
             .items-header { display: none; }
             .item-row { grid-template-columns: 30px 1fr; gap: 5px; }
@@ -73,12 +49,12 @@
 <body>
 
 <div class="container">
-    <div class="header">
+    <div class="header" id="mainHeader">
         <h1 id="pageTitle">Identificação</h1>
         <p class="subtitle" id="pageSubtitle">Passo 1 de 2</p>
     </div>
 
-    <!-- TELA 1 -->
+    <!-- PASSO 1 -->
     <div id="step1" class="step-content active">
         <div class="form-group search-wrapper">
             <label>Código do Projeto</label>
@@ -86,18 +62,14 @@
             <div id="projectList" class="project-list">
                 <div class="project-option" style="color: #999;">Carregando projetos...</div>
             </div>
-            
-            <!-- Feedback Visual -->
             <div id="projectFeedback" class="project-feedback"></div>
-            
             <input type="hidden" id="selectedProjectId">
             <input type="hidden" id="selectedProjectName">
         </div>
 
         <div class="form-group">
             <label>Coordenador / Solicitante</label>
-            <!-- Este campo será preenchido automaticamente -->
-            <input type="text" id="userName" placeholder="Preenchimento automático..." >
+            <input type="text" id="userName" placeholder="Preenchimento automático..." readonly>
         </div>
 
         <div class="form-group">
@@ -108,7 +80,7 @@
         <button class="btn" onclick="goToStep2()">Continuar</button>
     </div>
 
-    <!-- TELA 2 -->
+    <!-- PASSO 2 -->
     <div id="step2" class="step-content">
         <div class="user-summary">
             <strong>Projeto:</strong> <span id="summaryProject"></span><br>
@@ -138,17 +110,27 @@
         <button class="btn" id="btnSubmit" onclick="submitOrder()">Finalizar Solicitação</button>
         <button class="btn btn-secondary" onclick="backToStep1()">Voltar</button>
     </div>
+
+    <!-- PASSO 3 (Sucesso) -->
+    <div id="step3" class="step-content">
+        <div class="success-screen">
+            <div class="success-icon">✓</div>
+            <h2>Pedido Enviado!</h2>
+            <p>Sua solicitação foi registrada com sucesso.<br>O estoque foi atualizado automaticamente.</p>
+            <button class="btn" onclick="location.reload()">Fazer Nova Solicitação</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    // --- INSIRA A NOVA URL AQUI ---
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwokjId0MCGP9sx_cXRe1CYUL_28seR7o8dsWy5fdLw1UnkKMTTZ6mbL_u1DRRaSXWg1Q/exec';
+    // --- INSIRA SUA NOVA URL DO DEPLOY AQUI ---
+    const API_URL = 'SUA_URL_DO_APPS_SCRIPT_AQUI';
 
-    let projectsData = []; // [{id, projeto, coord}, ...]
+    let projectsData = [];
     
+    // Agora carregamos APENAS os projetos ao iniciar
     window.onload = function() {
         fetchProjects();
-        fetchTerms();
     };
 
     // --- LÓGICA PASSO 1 ---
@@ -157,7 +139,6 @@
         try {
             const res = await fetch(`${API_URL}?action=getProjetos`);
             const data = await res.json();
-            
             if (data.projetos && data.projetos.length > 0) {
                 projectsData = data.projetos;
                 renderProjectList(projectsData);
@@ -167,94 +148,78 @@
         } catch (e) { console.error(e); }
     }
 
-    // Renderiza a lista (pode ser filtrada)
     function renderProjectList(projects) {
         const list = document.getElementById('projectList');
         list.innerHTML = '';
-        
         if (projects.length === 0) {
             list.innerHTML = '<div class="project-option">Projeto não encontrado.</div>';
             return;
         }
-
         projects.forEach(p => {
             const div = document.createElement('div');
             div.className = 'project-option';
-            // Mostra Código e Nome na lista
             div.innerHTML = `<strong>${p.id}</strong><small>${p.projeto}</small>`;
             div.onclick = () => selectProject(p);
             list.appendChild(div);
         });
     }
 
-    // Filtro de pesquisa (busca por ID ou Nome)
     const searchInput = document.getElementById('projectSearch');
     const projectList = document.getElementById('projectList');
 
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         projectList.style.display = 'block';
-        
-        // Filtra o array original
         const filtered = projectsData.filter(p => 
             String(p.id).toLowerCase().includes(term) || 
             p.projeto.toLowerCase().includes(term)
         );
-        
         renderProjectList(filtered);
     });
 
-    searchInput.addEventListener('focus', () => {
-        if(projectsData.length > 0) projectList.style.display = 'block';
-    });
-    
-    // Pequeno delay para permitir o clique
-    searchInput.addEventListener('blur', () => {
-        setTimeout(() => projectList.style.display = 'none', 200);
-    });
+    searchInput.addEventListener('focus', () => { if(projectsData.length > 0) projectList.style.display = 'block'; });
+    searchInput.addEventListener('blur', () => { setTimeout(() => projectList.style.display = 'none', 200); });
 
-    // AÇÃO AO SELECIONAR PROJETO
     function selectProject(projectObj) {
-        // 1. Preenche o input de busca com o Código
         searchInput.value = projectObj.id;
-        
-        // 2. Guarda dados ocultos
         document.getElementById('selectedProjectId').value = projectObj.id;
         document.getElementById('selectedProjectName').value = projectObj.projeto;
         
-        // 3. Mostra Feedback Visual
         const feedback = document.getElementById('projectFeedback');
         feedback.style.display = 'block';
-        feedback.innerHTML = `✅ Solicitando itens para o Projeto: <strong>${projectObj.projeto}</strong>`;
+        feedback.innerHTML = `✅ Solicitando para: <strong>${projectObj.projeto}</strong>`;
         
-        // 4. Preenche Automaticamente o Coordenador
-        const nameInput = document.getElementById('userName');
-        nameInput.value = projectObj.coord;
-        
-        // Esconde lista
+        document.getElementById('userName').value = projectObj.coord;
         projectList.style.display = 'none';
     }
 
-    // --- NAVEGAÇÃO ---
+    // --- NAVEGAÇÃO ENTRE PASSOS ---
 
     function goToStep2() {
-        const projId = document.getElementById('selectedProjectId').value;
+        const projFullId = document.getElementById('selectedProjectId').value; // Ex: "798-Escola" ou apenas "798"
         const projName = document.getElementById('selectedProjectName').value;
         const name = document.getElementById('userName').value;
         const email = document.getElementById('userEmail').value;
 
-        if (!projId) return alert("Por favor, selecione um projeto da lista.");
+        if (!projFullId) return alert("Por favor, selecione um projeto da lista.");
         if (!name || !email) return alert("Preencha todos os campos.");
 
-        // Preenche resumo
-        document.getElementById('summaryProject').textContent = `${projId} - ${projName}`;
+        // Atualiza Resumo
+        document.getElementById('summaryProject').textContent = `${projFullId} - ${projName}`;
         document.getElementById('summaryUser').textContent = name;
         document.getElementById('summaryEmail').textContent = email;
 
+        // Troca de Tela
         document.getElementById('step1').classList.remove('active');
         document.getElementById('step2').classList.add('active');
         document.getElementById('pageTitle').textContent = "Seleção de Itens";
         document.getElementById('pageSubtitle').textContent = "Passo 2 de 2";
+
+        // *** AQUI É A MÁGICA ***
+        // Extrai apenas o número antes do hífen para filtrar os termos
+        // Se o ID for "798-Construção", pega "798". Se for só "798", pega "798".
+        const cleanId = projFullId.split('-')[0].trim();
+        fetchTerms(cleanId);
     }
 
     function backToStep1() {
@@ -262,20 +227,37 @@
         document.getElementById('step1').classList.add('active');
         document.getElementById('pageTitle').textContent = "Identificação";
         document.getElementById('pageSubtitle').textContent = "Passo 1 de 2";
+        
+        // Limpa a seleção de termo ao voltar, para forçar recarregamento se mudar projeto
+        document.getElementById('termSelect').innerHTML = '<option value="" disabled selected>Carregando...</option>';
+        document.getElementById('itemsContainer').style.display = 'none';
     }
 
-    // --- LÓGICA PASSO 2 (TERMOS E ITENS) ---
-    // (A lógica aqui é a mesma da versão anterior, só garantindo que funcione com o novo layout)
+    // --- LÓGICA DE TERMOS (Dinâmica baseada no Projeto) ---
 
-    async function fetchTerms() {
+    async function fetchTerms(projectCode) {
+        const select = document.getElementById('termSelect');
+        select.innerHTML = '<option value="" disabled selected>Carregando termos...</option>';
+        
         try {
-            const res = await fetch(`${API_URL}?action=getTermos`);
+            // Envia o projectCode para a API filtrar
+            const res = await fetch(`${API_URL}?action=getTermos&projectCode=${encodeURIComponent(projectCode)}`);
             const data = await res.json();
-            const select = document.getElementById('termSelect');
+            
             select.innerHTML = '<option value="" disabled selected>Selecione um termo...</option>';
-            data.termos.forEach(t => select.innerHTML += `<option value="${t}">${t}</option>`);
-        } catch (e) { console.error(e); }
+            
+            if (data.termos && data.termos.length > 0) {
+                data.termos.forEach(t => select.innerHTML += `<option value="${t}">${t}</option>`);
+            } else {
+                select.innerHTML = '<option value="" disabled>Nenhum termo disponível para este projeto</option>';
+            }
+        } catch (e) { 
+            console.error(e);
+            select.innerHTML = '<option value="" disabled>Erro ao carregar</option>';
+        }
     }
+
+    // --- RESTO DA LÓGICA (ITENS e ENVIO) MANTIDA IGUAL ---
 
     document.getElementById('termSelect').addEventListener('change', async function() {
         const termo = this.value;
@@ -290,7 +272,6 @@
         try {
             const res = await fetch(`${API_URL}?action=getItens&termo=${encodeURIComponent(termo)}`);
             const data = await res.json();
-            
             if(data.itens && data.itens.length > 0) {
                 renderItems(data.itens, list);
                 container.style.display = 'block';
@@ -361,13 +342,23 @@
         try {
             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
             const json = await res.json();
-            if(json.status === 'sucesso') { alert("Sucesso!"); location.reload(); }
-            else throw new Error(json.mensagem);
+            
+            if(json.status === 'sucesso') {
+                showSuccessScreen();
+            } else {
+                throw new Error(json.mensagem);
+            }
         } catch(e) {
             alert("Erro: " + e.message);
             btn.innerText = "Finalizar Solicitação";
             btn.disabled = false;
         }
+    }
+
+    function showSuccessScreen() {
+        document.getElementById('mainHeader').style.display = 'none';
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step3').classList.add('active');
     }
 </script>
 
