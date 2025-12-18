@@ -1,0 +1,37 @@
+<form id="meuFormulario">
+  <input type="text" name="Nome" placeholder="Seu Nome" required>
+  <input type="email" name="Email" placeholder="Seu Email" required>
+  <textarea name="Mensagem" placeholder="Sua mensagem"></textarea>
+  
+  <button type="submit">Enviar</button>
+</form>
+
+<script>
+  const form = document.getElementById('meuFormulario');
+  // COLE SUA URL DO APPS SCRIPT AQUI ABAIXO
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbxE6L4n-n2Z3SFgH-RUPCeCCvJoMmzqOop0i_r6ET4IdOZagEz-czxvymEntJhdftOAkA/exec';
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    
+    // Mostra que está enviando (opcional)
+    const btn = form.querySelector('button');
+    const textoOriginal = btn.innerText;
+    btn.innerText = 'Enviando...';
+    btn.disabled = true;
+
+    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+      .then(response => {
+        alert("Enviado com sucesso!");
+        form.reset();
+        btn.innerText = textoOriginal;
+        btn.disabled = false;
+      })
+      .catch(error => {
+        console.error('Erro!', error.message);
+        alert("Ops, algo deu errado.");
+        btn.innerText = textoOriginal;
+        btn.disabled = false;
+      });
+  });
+</script>
