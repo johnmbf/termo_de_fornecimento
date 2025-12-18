@@ -57,7 +57,7 @@ p.subtitle { color: #64748b; margin: 5px 0 0 0; font-size: 0.9rem; }
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    text-decoration: none; /* Para links */
+    text-decoration: none;
     color: inherit;
     display: flex;
     flex-direction: column;
@@ -90,7 +90,43 @@ p.subtitle { color: #64748b; margin: 5px 0 0 0; font-size: 0.9rem; }
     margin-top: 5px;
 }
 
-/* --- ELEMENTOS DO FORMULÁRIO --- */
+/* --- SELEÇÃO DE TERMOS (NOVO GRID) --- */
+.term-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.term-card {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+}
+
+.term-card:hover {
+    border-color: #93c5fd;
+    background-color: #eff6ff;
+}
+
+.term-card.selected {
+    border-color: var(--primary);
+    background-color: #eff6ff;
+    color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* --- ELEMENTOS GERAIS --- */
 .step-content { display: none; animation: fadeIn 0.4s ease; }
 .step-content.active { display: block; }
 
@@ -101,6 +137,7 @@ p.subtitle { color: #64748b; margin: 5px 0 0 0; font-size: 0.9rem; }
 
 .form-group { margin-bottom: 20px; position: relative; }
 label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: #475569; }
+
 input, select {
     width: 100%; padding: 12px;
     border: 1px solid #cbd5e1;
@@ -188,9 +225,9 @@ input:focus, select:focus {
     margin: 0 auto 20px auto; font-size: 40px;
 }
 
-/* Responsividade Mobile */
 @media (max-width: 600px) {
     .dashboard-grid { grid-template-columns: 1fr; }
+    .term-grid { grid-template-columns: 1fr; } /* Um termo por linha no celular */
     .items-header { display: none; }
     .item-row { grid-template-columns: 30px 1fr; gap: 5px; }
     .col-details { grid-column: 2; }
